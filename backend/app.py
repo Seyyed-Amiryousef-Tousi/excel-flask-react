@@ -14,6 +14,11 @@ if not os.path.exists(DB_NAME):
     conn = sqlite3.connect(DB_NAME)
     conn.close()
 
+# --- Route ساده برای تست اینکه سرور ران شده ---
+@app.route('/')
+def home():
+    return "Backend is running..."
+
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
