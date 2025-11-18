@@ -1,0 +1,9 @@
+# React
+node_modules/
+build/
+
+# Python / Flask
+__pycache__/
+*.pyc
+env/
+data.db
