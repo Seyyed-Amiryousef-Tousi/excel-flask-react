@@ -164,6 +164,20 @@ def get_products():
     return jsonify(data), 200
 
 
+# ---------------- Delete Product ----------------
+@app.route('/delete-product/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+    
+    cur.execute("DELETE FROM products WHERE id = ?", (product_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({"message": f"Product {product_id} deleted successfully"}), 200
+
+
+
 # ---------------- Run Server ----------------
 if __name__ == '__main__':
     app.run(debug=True)

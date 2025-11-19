@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import axios from "axios";
 
 export default function ProductGrid() {
   const [products, setProducts] = useState([]);
@@ -12,13 +14,23 @@ export default function ProductGrid() {
     loadProducts();
   }, []);
 
+  const deleteProduct = async (id) => {
+    if (window.confirm("آیا مطمئن هستید می‌خواهید این محصول حذف شود؟")) {
+      try {
+        await axios.delete(`http://localhost:5000/delete-product/${id}`);
+        loadProducts(); // بارگذاری مجدد محصولات
+      } catch (err) {
+        alert("خطا در حذف محصول");
+      }
+    }
+  };
+
   return (
     <div
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
         gap: "20px",
-        padding: "20px",
       }}
     >
       {products.map((p) => (
@@ -28,8 +40,7 @@ export default function ProductGrid() {
             border: "1px solid #ddd",
             borderRadius: "10px",
             padding: "15px",
-            background: "#fff",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+            position: "relative",
           }}
         >
           <img
@@ -40,6 +51,16 @@ export default function ProductGrid() {
           <h3>{p.name}</h3>
           <p>{p.desc}</p>
           <strong>{p.price} تومان</strong>
+          <DeleteIcon
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              cursor: "pointer",
+              color: "red",
+            }}
+            onClick={() => deleteProduct(p.id)}
+          />
         </div>
       ))}
     </div>
