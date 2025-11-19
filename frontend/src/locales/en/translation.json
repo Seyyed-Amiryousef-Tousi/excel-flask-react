@@ -1,0 +1,9 @@
+{
+  "upload_excel": "Upload Excel File",
+  "add_product": "Add Product",
+  "products": "Products",
+  "excel_data": "Excel Data",
+  "delete_excel_confirm": "Are you sure you want to delete Excel data?",
+  "all_fields_required": "All fields are required",
+  "product_added": "Product added!"
+}

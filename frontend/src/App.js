@@ -4,20 +4,22 @@ import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ProductGrid from "./ProductGrid";
 import ExcelTable from "./ExcelTable";
+import { useTranslation } from "react-i18next";
+import "./i18n";
 
 function App() {
+  const { t, i18n } = useTranslation();
+
   // ---------------- Excel Upload ----------------
   const [excelFile, setExcelFile] = useState(null);
   const [excelMessage, setExcelMessage] = useState("");
-  const [refreshExcel, setRefreshExcel] = useState(false); // برای رفرش جدول بعد از آپلود یا پاک کردن
+  const [refreshExcel, setRefreshExcel] = useState(false); // برای رفرش جدول
 
-  const handleExcelChange = (e) => {
-    setExcelFile(e.target.files[0]);
-  };
+  const handleExcelChange = (e) => setExcelFile(e.target.files[0]);
 
   const uploadExcel = async (e) => {
     e.preventDefault();
-    if (!excelFile) return setExcelMessage("Please select a file");
+    if (!excelFile) return setExcelMessage(t("select_file"));
 
     const formData = new FormData();
     formData.append("file", excelFile);
@@ -25,12 +27,12 @@ function App() {
     try {
       const res = await axios.post("http://localhost:5000/upload", formData);
       setExcelMessage(res.data.message);
-      setRefreshExcel(!refreshExcel); // بعد از آپلود جدول رفرش شود
-    } catch (err) {
-      setExcelMessage("Upload failed");
+      setRefreshExcel(!refreshExcel);
+    } catch {
+      setExcelMessage(t("upload_failed"));
     }
   };
-  
+
   // ---------------- Add Product ----------------
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
@@ -41,17 +43,14 @@ function App() {
   const handleImage = (e) => {
     const img = e.target.files[0];
     const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = reader.result.split(",")[1];
-      setFileB64(base64);
-    };
+    reader.onload = () => setFileB64(reader.result.split(",")[1]);
     reader.readAsDataURL(img);
   };
 
   const addProduct = async (e) => {
     e.preventDefault();
     if (!name || !desc || !price || !fileB64)
-      return setAddMessage("همه فیلدها لازم است");
+      return setAddMessage(t("all_fields_required"));
 
     try {
       await axios.post("http://localhost:5000/add-product", {
@@ -60,33 +59,45 @@ function App() {
         price,
         image: fileB64,
       });
-      setAddMessage("Product added!");
-    } catch (err) {
-      setAddMessage("Error adding product");
+      setAddMessage(t("product_added"));
+    } catch {
+      setAddMessage(t("error_adding_product"));
     }
   };
 
   // ---------------- Delete Excel ----------------
   const deleteExcel = async () => {
-    if (window.confirm("آیا مطمئن هستید می‌خواهید داده‌های اکسل پاک شوند؟")) {
+    if (window.confirm(t("delete_excel_confirm"))) {
       try {
         await axios.delete("http://localhost:5000/delete-excel");
-        setExcelMessage("Excel data cleared!");
-        setRefreshExcel(!refreshExcel); // جدول رفرش شود
-      } catch (err) {
-        setExcelMessage("Error clearing excel data");
+        setExcelMessage(t("excel_cleared"));
+        setRefreshExcel(!refreshExcel);
+      } catch {
+        setExcelMessage(t("error_clearing_excel"));
       }
     }
   };
 
+  // ---------------- Change Language ----------------
+  const changeLanguage = (lang) => i18n.changeLanguage(lang);
 
   return (
     <div style={{ padding: 20, direction: "rtl", fontFamily: "sans-serif" }}>
+      {/* ================= Language Switch ================= */}
+      <div style={{ marginBottom: 20 }}>
+        <button onClick={() => changeLanguage("fa")}>{t("lang_fa")}</button>
+        <button onClick={() => changeLanguage("en")}>{t("lang_en")}</button>
+      </div>
+
       {/* ================= Excel Upload Section ================= */}
-      <h2>Upload Excel File</h2>
+      <h2>{t("upload_excel")}</h2>
       <form onSubmit={uploadExcel}>
-        <input type="file" accept=".xls,.xlsx,.xlsm,.csv" onChange={handleExcelChange} />
-        <button type="submit">Upload</button>
+        <input
+          type="file"
+          accept=".xls,.xlsx,.xlsm,.csv"
+          onChange={handleExcelChange}
+        />
+        <button type="submit">{t("upload")}</button>
       </form>
       {excelMessage && <p>{excelMessage}</p>}
 
@@ -94,7 +105,7 @@ function App() {
 
       {/* ================= Excel Table with Delete ================= */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <h3>Excel Data</h3>
+        <h3>{t("excel_data")}</h3>
         <DeleteIcon
           style={{ cursor: "pointer", color: "red" }}
           onClick={deleteExcel}
@@ -105,36 +116,36 @@ function App() {
       <hr style={{ margin: "30px 0" }} />
 
       {/* ================= Add Product Section ================= */}
-      <h2>Add Product</h2>
+      <h2>{t("add_product")}</h2>
       <form onSubmit={addProduct}>
         <input
           type="text"
-          placeholder="Name"
+          placeholder={t("name")}
           onChange={(e) => setName(e.target.value)}
         />
         <br />
         <input
           type="text"
-          placeholder="Description"
+          placeholder={t("description")}
           onChange={(e) => setDesc(e.target.value)}
         />
         <br />
         <input
           type="number"
-          placeholder="Price"
+          placeholder={t("price")}
           onChange={(e) => setPrice(e.target.value)}
         />
         <br />
         <input type="file" accept="image/*" onChange={handleImage} />
         <br />
-        <button type="submit">Add Product</button>
+        <button type="submit">{t("add_product")}</button>
       </form>
       {addMessage && <p>{addMessage}</p>}
 
       <hr style={{ margin: "30px 0" }} />
 
       {/* ================= Products Grid ================= */}
-      <h2>Products</h2>
+      <h2>{t("products")}</h2>
       <ProductGrid />
     </div>
   );
