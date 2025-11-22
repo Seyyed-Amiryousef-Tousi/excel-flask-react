@@ -17,6 +17,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { Link } from "react-router-dom";
+import logo from "../assets/image/logo.png";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -30,8 +31,7 @@ export default function Navbar() {
 
   const links = [
     { to: "/", label: "لیست محصولات" },
-    { to: "/add-product", label: "افزودن محصول" },
-    { to: "/Admin", label: "داشبورد ادمین" },
+    { to: "/Admin", label: "داشبورد" },
   ];
 
   const drawerContent = (
@@ -67,14 +67,20 @@ export default function Navbar() {
           <Typography
             variant="h6"
             component={Link}
-            to="/"
+            to=""
             sx={{
               textDecoration: "none",
               color: darkMode ? "#fff" : "#000",
               fontWeight: "bold",
+              display: "flex",
+              alignItems: "center",
             }}
           >
-            MyLogo
+            <img
+              src={logo}
+              alt="my logo"
+              style={{ height: "40px", objectFit: "contain" }}
+            />
           </Typography>
 
           {/* Desktop links */}
