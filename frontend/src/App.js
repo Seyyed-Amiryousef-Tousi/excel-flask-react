@@ -1,154 +1,26 @@
-// App.jsx
-import React, { useState } from "react";
-import axios from "axios";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ProductGrid from "./ProductGrid";
-import ExcelTable from "./ExcelTable";
-import { useTranslation } from "react-i18next";
-import "./i18n";
 
-function App() {
-  const { t, i18n } = useTranslation();
 
-  // ---------------- Excel Upload ----------------
-  const [excelFile, setExcelFile] = useState(null);
-  const [excelMessage, setExcelMessage] = useState("");
-  const [refreshExcel, setRefreshExcel] = useState(false); // برای رفرش جدول
+// export default App;
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Products from "./components/Products";
+import AddProduct from "./components/AddProduct";
+import Admin from "./components/Admin";
+// import ExcelUpload from "./components/ExcelUpload";
+// import ExcelPreview from "./components/ExcelPreview";
 
-  const handleExcelChange = (e) => setExcelFile(e.target.files[0]);
-
-  const uploadExcel = async (e) => {
-    e.preventDefault();
-    if (!excelFile) return setExcelMessage(t("select_file"));
-
-    const formData = new FormData();
-    formData.append("file", excelFile);
-
-    try {
-      const res = await axios.post("http://localhost:5000/upload", formData);
-      setExcelMessage(res.data.message);
-      setRefreshExcel(!refreshExcel);
-    } catch {
-      setExcelMessage(t("upload_failed"));
-    }
-  };
-
-  // ---------------- Add Product ----------------
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-  const [price, setPrice] = useState("");
-  const [fileB64, setFileB64] = useState("");
-  const [addMessage, setAddMessage] = useState("");
-
-  const handleImage = (e) => {
-    const img = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => setFileB64(reader.result.split(",")[1]);
-    reader.readAsDataURL(img);
-  };
-
-  const addProduct = async (e) => {
-    e.preventDefault();
-    if (!name || !desc || !price || !fileB64)
-      return setAddMessage(t("all_fields_required"));
-
-    try {
-      await axios.post("http://localhost:5000/add-product", {
-        name,
-        desc,
-        price,
-        image: fileB64,
-      });
-      setAddMessage(t("product_added"));
-    } catch {
-      setAddMessage(t("error_adding_product"));
-    }
-  };
-
-  // ---------------- Delete Excel ----------------
-  const deleteExcel = async () => {
-    if (window.confirm(t("delete_excel_confirm"))) {
-      try {
-        await axios.delete("http://localhost:5000/delete-excel");
-        setExcelMessage(t("excel_cleared"));
-        setRefreshExcel(!refreshExcel);
-      } catch {
-        setExcelMessage(t("error_clearing_excel"));
-      }
-    }
-  };
-
-  // ---------------- Change Language ----------------
-  const changeLanguage = (lang) => i18n.changeLanguage(lang);
-
+export default function App() {
   return (
-    <div style={{ padding: 20, direction: "rtl", fontFamily: "sans-serif" }}>
-      {/* ================= Language Switch ================= */}
-      <div style={{ marginBottom: 20 }}>
-        <button onClick={() => changeLanguage("fa")}>{t("lang_fa")}</button>
-        <button onClick={() => changeLanguage("en")}>{t("lang_en")}</button>
-      </div>
-
-      {/* ================= Excel Upload Section ================= */}
-      <h2>{t("upload_excel")}</h2>
-      <form onSubmit={uploadExcel}>
-        <input
-          type="file"
-          accept=".xls,.xlsx,.xlsm,.csv"
-          onChange={handleExcelChange}
-        />
-        <button type="submit">{t("upload")}</button>
-      </form>
-      {excelMessage && <p>{excelMessage}</p>}
-
-      <hr style={{ margin: "30px 0" }} />
-
-      {/* ================= Excel Table with Delete ================= */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <h3>{t("excel_data")}</h3>
-        <DeleteIcon
-          style={{ cursor: "pointer", color: "red" }}
-          onClick={deleteExcel}
-        />
-      </div>
-      <ExcelTable refresh={refreshExcel} />
-
-      <hr style={{ margin: "30px 0" }} />
-
-      {/* ================= Add Product Section ================= */}
-      <h2>{t("add_product")}</h2>
-      <form onSubmit={addProduct}>
-        <input
-          type="text"
-          placeholder={t("name")}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <br />
-        <input
-          type="text"
-          placeholder={t("description")}
-          onChange={(e) => setDesc(e.target.value)}
-        />
-        <br />
-        <input
-          type="number"
-          placeholder={t("price")}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-        <br />
-        <input type="file" accept="image/*" onChange={handleImage} />
-        <br />
-        <button type="submit">{t("add_product")}</button>
-      </form>
-      {addMessage && <p>{addMessage}</p>}
-
-      <hr style={{ margin: "30px 0" }} />
-
-      {/* ================= Products Grid ================= */}
-      <h2>{t("products")}</h2>
-      <ProductGrid />
-    </div>
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Products />} />
+        <Route path="/add-product" element={<AddProduct />} />
+        <Route path="/Admin" element={<Admin />} />
+        {/* <Route path="/excel-upload" element={<ExcelUpload />} />
+        <Route path="/excel-preview" element={<ExcelPreview />} /> */}
+      </Routes>
+    </Router>
   );
 }
 
-export default App;

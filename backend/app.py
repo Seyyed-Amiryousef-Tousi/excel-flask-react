@@ -7,6 +7,8 @@ import os
 app = Flask(__name__)
 CORS(app)
 
+
+
 DB_NAME = "data.db"
 
 # ---------------- Ensure DB Exists ----------------
@@ -68,7 +70,7 @@ def upload_file():
         df.columns = [c.strip().lower() for c in df.columns]
 
         conn = sqlite3.connect(DB_NAME)
-        df.to_sql('excel_data', conn, if_exists='append', index=False)
+        df.to_sql('products', conn, if_exists='append', index=False)
         conn.close()
 
         return jsonify({'message': 'File uploaded and data saved to database successfully'}), 200
@@ -176,8 +178,18 @@ def delete_product(product_id):
     
     return jsonify({"message": f"Product {product_id} deleted successfully"}), 200
 
+# ---------------- Admin Server ----------------
 
-
+@app.route('/Admin', methods=['GET'])
+def Admin():
+    # می‌تونی اینجا داده واقعی از دیتابیس هم بیاری
+    data = {
+        "message": "Welcome to Admin Panel",
+        "users_count": 42,
+        "active": True
+    }
+    return jsonify(data)
+    
 # ---------------- Run Server ----------------
 if __name__ == '__main__':
     app.run(debug=True)
