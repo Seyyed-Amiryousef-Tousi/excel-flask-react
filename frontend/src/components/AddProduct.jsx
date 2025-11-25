@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -16,6 +16,7 @@ export default function AddProduct() {
     price: "",
     imageFile: null,
   });
+
   const [preview, setPreview] = useState(null);
 
   const handleChange = (e) => {
@@ -23,26 +24,21 @@ export default function AddProduct() {
   };
 
   const handleImage = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // ذخیره فایل در state
-  setForm(prev => ({ ...prev, imageFile: file }));
+    setForm((prev) => ({ ...prev, imageFile: file }));
 
-  // ساخت Base64 برای پیش‌نمایش
-  const reader = new FileReader();
-  reader.onloadend = () => {
-    setPreview(reader.result); // Base64
-    setForm(prev => ({ ...prev, image: reader.result })); // آماده ارسال JSON
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
-  reader.readAsDataURL(file);
-};
-
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // جلوگیری از reload صفحه
+    e.preventDefault();
 
-    // بررسی فیلدهای ضروری
     if (!form.name || !form.description || !form.price) {
       alert("لطفاً همه فیلدها را پر کنید");
       return;
@@ -54,38 +50,42 @@ export default function AddProduct() {
       data.append("description", form.description);
       data.append("price", form.price);
 
-      // فقط اگر فایل انتخاب شده باشد
       if (form.imageFile) {
         data.append("image", form.imageFile);
       }
 
-      // ارسال به سرور
-      await axios.post("http://127.0.0.1:5000/add-product", data);
+      await axios.post("http://127.0.0.1:5000/add-product", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       alert("محصول اضافه شد");
 
-      // ریست فرم و پیش‌نمایش
       setForm({ name: "", description: "", price: "", imageFile: null });
       setPreview(null);
     } catch (err) {
-      console.error(err.response || err);
+      console.error(err);
       alert("خطا در ثبت محصول");
     }
   };
 
   return (
     <Paper
-      elevation={4}
+      elevation={6}
       sx={{
-        maxWidth: 500,
+        maxWidth: 520,
         mx: "auto",
         mt: 5,
         p: 4,
-        borderRadius: 3,
-        bgcolor: "#fafafa",
+        borderRadius: 4,
+        bgcolor: "#ffffff",
       }}
     >
-      <Typography variant="h5" mb={3} textAlign="center">
+      <Typography
+        variant="h5"
+        mb={3}
+        textAlign="center"
+        sx={{ fontWeight: "bold" }}
+      >
         افزودن محصول جدید
       </Typography>
 
@@ -120,7 +120,11 @@ export default function AddProduct() {
           required
         />
 
-        <Button variant="contained" component="label">
+        <Button
+          variant="contained"
+          component="label"
+          sx={{ py: 1.2, fontWeight: 600 }}
+        >
           آپلود تصویر
           <input type="file" hidden accept="image/*" onChange={handleImage} />
         </Button>
@@ -132,9 +136,9 @@ export default function AddProduct() {
             alt="Preview"
             sx={{
               width: "100%",
-              borderRadius: 2,
-              mt: 1,
-              border: "1px solid #ccc",
+              borderRadius: 3,
+              mt: 2,
+              border: "1px solid #ddd",
             }}
           />
         )}
@@ -143,7 +147,7 @@ export default function AddProduct() {
           type="submit"
           variant="contained"
           color="primary"
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, py: 1.3, fontWeight: 700, fontSize: "1rem" }}
         >
           ثبت محصول
         </Button>

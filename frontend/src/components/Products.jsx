@@ -55,7 +55,7 @@ export default function ProductGrid() {
               <CardMedia
                 component="img"
                 height="180"
-                image={`data:image/jpeg;base64,${p.image}`}
+                image={p.image}
                 alt={p.name}
                 sx={{ objectFit: "cover" }}
               />
@@ -83,23 +83,14 @@ export default function ProductGrid() {
               >
                 {p.description}
               </Typography>
-              <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: "bold" }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ mt: 1, fontWeight: "bold" }}
+              >
                 {p.price} $
               </Typography>
             </CardContent>
-            <CardActions sx={{ justifyContent: "space-between" }}>
-              <Button
-                size="small"
-                color="error"
-                variant="contained"
-                onClick={() => handleDelete(p.id)}
-              >
-                حذف
-              </Button>
-              <Button size="small" variant="outlined">
-                جزئیات
-              </Button>
-            </CardActions>
+
           </Card>
         </Grid>
       ))}

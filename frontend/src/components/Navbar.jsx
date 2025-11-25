@@ -7,27 +7,17 @@ import {
   Drawer,
   Box,
   Typography,
-  Badge,
-  Menu,
-  MenuItem,
-  Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
+import LoginIcon from "@mui/icons-material/Login";
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import { Link } from "react-router-dom";
 import logo from "../assets/image/logo.png";
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
-  const toggleDarkMode = () => setDarkMode(!darkMode);
-  const openProfileMenu = (event) => setAnchorEl(event.currentTarget);
-  const closeProfileMenu = () => setAnchorEl(null);
 
   const links = [
     { to: "/", label: "لیست محصولات" },
@@ -35,31 +25,79 @@ export default function Navbar() {
   ];
 
   const drawerContent = (
-    <Box sx={{ width: 220, p: 2, direction: "rtl" }}>
+    <Box sx={{ width: 240, p: 2, direction: "rtl" }}>
       {links.map((item) => (
         <Button
           key={item.to}
           component={Link}
           to={item.to}
           onClick={toggleDrawer}
-          sx={{ display: "block", width: "100%", justifyContent: "flex-start" }}
+          sx={{
+            display: "block",
+            width: "100%",
+            justifyContent: "flex-start",
+            fontSize: "0.95rem",
+          }}
         >
           {item.label}
         </Button>
       ))}
+
+      {/* Login - Mobile */}
+      <Button
+        component={Link}
+        to="/login"
+        onClick={toggleDrawer}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          width: "100%",
+          justifyContent: "flex-start",
+          mt: 2,
+        }}
+      >
+        <LoginIcon />
+        ورود
+      </Button>
+
+      {/* Sign Up - Mobile */}
+      <Button
+        component={Link}
+        to="/register"
+        onClick={toggleDrawer}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          width: "100%",
+          justifyContent: "flex-start",
+          mt: 1,
+        }}
+      >
+        <PersonAddAltIcon />
+        ثبت‌نام
+      </Button>
     </Box>
   );
 
   return (
-    <Box sx={{ direction: "rtl" }}>
+    <Box sx={{ direction: "rtl", mb: 3 }}>
       <AppBar
-        position="static"
-        color={darkMode ? "primary" : "default"}
-        sx={{ bgcolor: darkMode ? "#111" : "#f8f8f8" }}
+        position="sticky"
+        elevation={2}
+        sx={{
+          bgcolor: "#ffffff",
+          color: "#000",
+          borderBottom: "1px solid #e0e0e0",
+        }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          {/* Mobile menu */}
-          <IconButton onClick={toggleDrawer} sx={{ display: { md: "none" } }}>
+          {/* Mobile Menu Button */}
+          <IconButton
+            onClick={toggleDrawer}
+            sx={{ display: { md: "none" }, color: "#000" }}
+          >
             <MenuIcon />
           </IconButton>
 
@@ -67,10 +105,10 @@ export default function Navbar() {
           <Typography
             variant="h6"
             component={Link}
-            to=""
+            to="/"
             sx={{
               textDecoration: "none",
-              color: darkMode ? "#fff" : "#000",
+              color: "inherit",
               fontWeight: "bold",
               display: "flex",
               alignItems: "center",
@@ -78,51 +116,58 @@ export default function Navbar() {
           >
             <img
               src={logo}
-              alt="my logo"
-              style={{ height: "40px", objectFit: "contain" }}
+              alt="Logo"
+              style={{ height: "42px", objectFit: "contain" }}
             />
           </Typography>
 
-          {/* Desktop links */}
+          {/* Desktop Menu */}
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
             {links.map((item) => (
-              <Button key={item.to} component={Link} to={item.to}>
+              <Button
+                key={item.to}
+                component={Link}
+                to={item.to}
+                sx={{ color: "#000", fontSize: "0.95rem" }}
+              >
                 {item.label}
               </Button>
             ))}
-          </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            {/* Dark mode */}
-            <IconButton onClick={toggleDarkMode}>
-              {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-            </IconButton>
-
-            {/* Notifications */}
-            <IconButton>
-              <Badge badgeContent={3} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-
-            {/* Profile */}
-            <IconButton onClick={openProfileMenu}>
-              <Avatar alt="User" src="/static/images/avatar/1.jpg" />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={closeProfileMenu}
+            {/* Login - Desktop */}
+            <Button
+              component={Link}
+              to="/login"
+              sx={{
+                color: "#000",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
             >
-              <MenuItem onClick={closeProfileMenu}>پروفایل</MenuItem>
-              <MenuItem onClick={closeProfileMenu}>تنظیمات</MenuItem>
-              <MenuItem onClick={closeProfileMenu}>خروج</MenuItem>
-            </Menu>
+              <LoginIcon />
+              ورود
+            </Button>
+
+            {/* Sign Up - Desktop */}
+            <Button
+              component={Link}
+              to="/signup"
+              sx={{
+                color: "#000",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <PersonAddAltIcon />
+              ثبت‌نام
+            </Button>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Drawer for mobile */}
+      {/* Mobile Drawer */}
       <Drawer
         open={mobileOpen}
         onClose={toggleDrawer}

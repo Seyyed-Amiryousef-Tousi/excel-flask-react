@@ -6,8 +6,9 @@ import Navbar from "./components/Navbar";
 import Products from "./components/Products";
 import AddProduct from "./components/AddProduct";
 import Admin from "./components/Admin";
-// import ExcelUpload from "./components/ExcelUpload";
-// import ExcelPreview from "./components/ExcelPreview";
+import Login from "./components/Login";
+import Signup from "./components/Signup";
+
 
 export default function App() {
   return (
@@ -17,10 +18,12 @@ export default function App() {
         <Route path="/" element={<Products />} />
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/Admin" element={<Admin />} />
-        {/* <Route path="/excel-upload" element={<ExcelUpload />} />
-        <Route path="/excel-preview" element={<ExcelPreview />} /> */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
+      
     </Router>
+    
   );
 }
 
