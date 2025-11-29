@@ -242,6 +242,52 @@ def register():
     return jsonify({"message": "User registered successfully"}), 201
 
 # ---------------- Login ----------------
+# @app.route("/login", methods=["POST"])
+# def login():
+#     data = request.json
+#     phone = data.get("phone")
+#     password = data.get("password")
+
+#     conn = db()
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT id, password FROM users WHERE phone=?", (phone,))
+#     user = cursor.fetchone()
+
+#     if not user:
+#         conn.close()
+#         return jsonify({"error": "User not found"}), 404
+
+#     stored_password = user[1].encode('utf-8')
+#     if not bcrypt.checkpw(password.encode('utf-8'), stored_password):
+#         conn.close()
+#         return jsonify({"error": "Wrong password"}), 401
+
+#     # ثبت زمان لاگین در ستون last_login
+#     import datetime
+#     now = datetime.datetime.utcnow().isoformat()
+#     cursor.execute("UPDATE users SET last_login=? WHERE id=?", (now, user[0]))
+
+#     # ایجاد رکورد در جدول user_sessions
+#     cursor.execute(
+#         "INSERT INTO user_sessions (user_id, login_time) VALUES (?, ?)",
+#         (user[0], now)
+#     )
+
+#     conn.commit()
+#     conn.close()
+
+#     token = jwt.encode(
+#         {
+#             "user_id": user[0],
+#             "exp": datetime.datetime.utcnow() + datetime.timedelta(days=7)
+#         },
+#         app.config["SECRET_KEY"],
+#         algorithm="HS256"
+#     )
+
+#     return jsonify({"token": token}), 200
+
+
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
@@ -250,7 +296,8 @@ def login():
 
     conn = db()
     cursor = conn.cursor()
-    cursor.execute("SELECT id, password FROM users WHERE phone=?", (phone,))
+    cursor.execute(
+        "SELECT id, password, role FROM users WHERE phone=?", (phone,))
     user = cursor.fetchone()
 
     if not user:
@@ -262,17 +309,12 @@ def login():
         conn.close()
         return jsonify({"error": "Wrong password"}), 401
 
-    # ثبت زمان لاگین در ستون last_login
-    import datetime
     now = datetime.datetime.utcnow().isoformat()
     cursor.execute("UPDATE users SET last_login=? WHERE id=?", (now, user[0]))
-
-    # ایجاد رکورد در جدول user_sessions
     cursor.execute(
         "INSERT INTO user_sessions (user_id, login_time) VALUES (?, ?)",
         (user[0], now)
     )
-
     conn.commit()
     conn.close()
 
@@ -285,8 +327,10 @@ def login():
         algorithm="HS256"
     )
 
-    return jsonify({"token": token}), 200
-
+    return jsonify({
+        "token": token,
+        "role": user[2]  # 🔥 نقش اینجاست
+    }), 200
 
 
 # ---------------- Get All Users ----------------

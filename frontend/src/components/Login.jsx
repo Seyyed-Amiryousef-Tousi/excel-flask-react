@@ -12,7 +12,16 @@ export default function Login() {
   const submit = async () => {
     try {
       const res = await axios.post("http://localhost:5000/login", form);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      // ذخیره داده صحیح
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          token: res.data.token,
+          role: res.data.role,
+        })
+      );
+
       window.location.href = "/admin";
     } catch (e) {
       alert("ورود ناموفق");

@@ -6,8 +6,6 @@ import {
   CardContent,
   CardMedia,
   Typography,
-  CardActions,
-  Button,
 } from "@mui/material";
 
 export default function ProductGrid() {
@@ -27,17 +25,6 @@ export default function ProductGrid() {
     fetchProducts();
   }, []);
 
-  // حذف محصول با ID مشخص
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:5000/products/${id}`);
-      // بعد از حذف، دوباره محصولات را بارگذاری می‌کنیم
-      fetchProducts();
-    } catch (err) {
-      console.error(err);
-      alert("خطا در حذف محصول!");
-    }
-  };
 
   return (
     <Grid container spacing={3} sx={{ mt: 2 }}>
