@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
 import pandas as pd
 import sqlite3
@@ -6,6 +6,7 @@ import os
 import bcrypt
 import jwt
 import datetime
+import psutil
 
 app = Flask(__name__)
 CORS(app)
@@ -48,9 +49,83 @@ conn.close()
 
 
 # ---------------- Home ----------------
+
+@app.route('/api/status')
+def api_status():
+    db_status = "Unknown"
+    try:
+        conn = sqlite3.connect("data.db")
+        conn.execute("SELECT 1")
+        conn.close()
+        db_status = "OK ✅"
+    except Exception as e:
+        db_status = f"Error ❌: {str(e)}"
+
+    cpu_percent = psutil.cpu_percent(interval=0.5)
+    ram_percent = psutil.virtual_memory().percent
+
+    return jsonify({
+        "cpu_usage_percent": cpu_percent,
+        "ram_usage_percent": ram_percent,
+        "database": db_status,
+        "server_time": datetime.datetime.utcnow().isoformat() + "Z",
+        "status": "🔥 Backend is running!",
+        "message": "Everything is working smoothly 😎"
+    })
+
+# روت اصلی با HTML و JS برای آپدیت زنده
+
+
 @app.route('/')
 def home():
-    return "Backend is running..."
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Server Live Status</title>
+        <style>
+            body { font-family: Arial, sans-serif; background-color: #1e1e2f; color: #fff; text-align: center; padding: 50px; }
+            .card { background-color: #2e2e4f; padding: 20px; margin: 20px auto; border-radius: 15px; width: 350px; box-shadow: 0 0 10px #000; transition: 0.3s; }
+            h1 { color: #ff4500; }
+            .ok { color: #00ff00; }
+            .error { color: #ff5555; }
+        </style>
+    </head>
+    <body>
+        <h1>🔥 Backend Live Status</h1>
+        <div class="card">
+            <p>Status: <strong id="status">Loading...</strong></p>
+            <p>Server Time: <span id="time">--</span></p>
+            <p>Database: <span id="db">--</span></p>
+            <p>CPU Usage: <span id="cpu">--</span>%</p>
+            <p>RAM Usage: <span id="ram">--</span>%</p>
+            <p>Message: <span id="msg">--</span></p>
+        </div>
+
+        <script>
+            async function fetchStatus() {
+                try {
+                    const response = await fetch('/api/status');
+                    const data = await response.json();
+                    document.getElementById('status').textContent = data.status;
+                    document.getElementById('time').textContent = data.server_time;
+                    document.getElementById('db').textContent = data.database;
+                    document.getElementById('cpu').textContent = data.cpu_usage_percent;
+                    document.getElementById('ram').textContent = data.ram_usage_percent;
+                    document.getElementById('msg').textContent = data.message;
+                } catch (err) {
+                    console.error('Error fetching status:', err);
+                }
+            }
+
+            // آپدیت هر 2 ثانیه
+            setInterval(fetchStatus, 2000);
+            fetchStatus();  // اولین بار بلافاصله
+        </script>
+    </body>
+    </html>
+    """
+    return render_template_string(html)
 
 
 # ---------------- Upload Excel ----------------
